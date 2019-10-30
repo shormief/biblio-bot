@@ -7,7 +7,7 @@ import time
 import openpyxl
 from slackclient import SlackClient
 
-SLACK_BOT_TOKEN = "[SLACK-BOT-TOKEN]"
+SLACK_BOT_TOKEN = ""
 SLACK_CHANNEL = "#biblio-bot"
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 
@@ -62,9 +62,20 @@ def scraping_books():
 
             # checking if the book is available for request
             try:
-                driver.find_element_by_id("requestLocations")
+                objectFrame = driver.find_element_by_id("widgetObj")
+                # checking if the book has available copies
+                openWidget = objectFrame.get_attribute("data")
+                time.sleep(10)
+                driver.get(openWidget)
+                ableToRequest = driver.find_element_by_id("requestLocationLogin")
+
+                # getting the direct URL to request 
+                requestURL = ableToRequest.get_attribute("href")
+
+                # writing the message
                 message = "*{}* is available for request \n".format(title)
-                message += "{}".format(url)
+                message += "{}".format(requestURL)
+
                 # posting the message to slack
                 slack_client.api_call (
                     "chat.postMessage", 
@@ -72,10 +83,12 @@ def scraping_books():
                     text=message, 
                     username='Bibli'
                 )
+                
                 # rewriting excel sheet 
                 sheet.cell(x, notifiedCol).value = 'Yes'
                 wb.save(loc)
-            except: continue
+            except: 
+                continue
             time.sleep(20) 
     driver.close()
     return 

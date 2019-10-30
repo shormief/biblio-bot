@@ -2,12 +2,11 @@ from selenium import webdriver
 import time
 import sys
 import traceback
-from library_scraper import scraping_books
+from book_scraper import scraping_books
 
 if __name__ == "__main__":
     while True:
         print("{}: Starting scrape cycle".format(time.ctime()))
-        # scraping(driver)
         try:
             scraping_books()
         except KeyboardInterrupt:
@@ -18,4 +17,4 @@ if __name__ == "__main__":
             traceback.print_exc()
         else: 
             print("{}: End of scrape cycle".format(time.ctime()))
-        time.sleep(60)
+        time.sleep(30*60)
